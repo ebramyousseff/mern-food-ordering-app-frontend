@@ -1,14 +1,52 @@
-import { useCreateMyRestaurant, useGetMyRestaurant, useUpdateMyRestaurant } from "@/api/MyRestaurantApi";
-import ManageRestaurantForm from "@/forms/user-profile-form/manage-restaurant-form/ManageRestaurantForm"
+import {
+  useCreateMyRestaurant,
+  useGetMyRestaurant,
+  useGetMyRestaurantOrders,
+  useUpdateMyRestaurant,
+} from "@/api/MyRestaurantApi";
+import OrderItemCard from "@/components/OrderItemCard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ManageRestaurantForm from "@/forms/user-profile-form/manage-restaurant-form/ManageRestaurantForm";
 
 const ManageRestaurantPage = () => {
-  const {createRestaurant, isPending :isCreatePending} = useCreateMyRestaurant();
-  const {restaurant}= useGetMyRestaurant();
-  const {updateRestaurant, isPending :isUpdatePending} = useUpdateMyRestaurant();
-  const isEditing = !!restaurant
-  return (
-    <div><ManageRestaurantForm onSave={isEditing ? updateRestaurant : createRestaurant} isLoading={isCreatePending || isUpdatePending}/></div>
-  )
-}
+  const { createRestaurant, isPending: isCreatePending } =
+    useCreateMyRestaurant();
 
-export default ManageRestaurantPage
+  const { restaurant } = useGetMyRestaurant();
+
+  const { updateRestaurant, isPending: isUpdatePending } =
+    useUpdateMyRestaurant();
+
+  const { orders } = useGetMyRestaurantOrders();
+
+  const isEditing = !!restaurant;
+
+  return (
+    <div>
+      <Tabs defaultValue="orders" className="w-[400px]">
+        <TabsList>
+          <TabsTrigger value="orders">Orders</TabsTrigger>
+          <TabsTrigger value="manage-restaurant">Manage Restaurant</TabsTrigger>
+        </TabsList>
+        <TabsContent
+          value="orders"
+          className="space-y-5 bg-gray-50 pg-10 rounded-lg"
+        >
+          <h2 className="text-2x1 font-bold">{orders?.length} active orders</h2>
+          {orders?.map((order) => (
+            <OrderItemCard order={order} />
+          ))}
+        </TabsContent>
+        <TabsContent value="manage-restaurant">
+          <ManageRestaurantForm
+            restaurant={restaurant}
+            onSave={isEditing ? updateRestaurant : createRestaurant}
+            isLoading={isCreatePending || isUpdatePending}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default ManageRestaurantPage;
