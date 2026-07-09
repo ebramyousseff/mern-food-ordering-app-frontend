@@ -31,7 +31,7 @@ function App() {
           </Layout>
         }
       />
-       <Route
+      <Route
         path="/detail/:restaurantId"
         element={
           <Layout showHero={false}>
